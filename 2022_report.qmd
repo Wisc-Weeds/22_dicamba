@@ -1,0 +1,53 @@
+---
+title: "2022 Bayer Hooded Sprayer"
+author: "Maxwel C Oliveira"
+format: html
+---
+
+
+```{r}
+library(tidyverse)
+library(drc)
+```
+
+
+
+```{r}
+readxl::read_excel("dataset.xlsx") %>% 
+  janitor::clean_names() %>% 
+  mutate(rating_dat = as_factor(rating_dat)) %>% 
+  mutate_if(is_character, as_factor) -> dat
+```
+
+
+
+
+
+```{r}
+dat %>% 
+#  filter(rating_dat == 14) %>% 
+  ggplot(aes(x = distance_m, y = rating_avg3plants, color = boom)) +
+  facet_grid(rating_dat ~ location) +
+  geom_point() +
+  scale_color_viridis_d() +
+  theme_bw()
+```
+
+
+## Missouri
+
+```{r}
+miss14 <- dat %>% 
+  filter(rating_dat == "28" & location == "Missouri")
+```
+
+
+```{r}
+model_14_mo <- drm(rating_avg3plants ~ distance_m, boom, fct = weibull2(), data = miss14)
+```
+
+```{r}
+plot(model_14_mo)
+summary(model_14_mo)
+```
+
